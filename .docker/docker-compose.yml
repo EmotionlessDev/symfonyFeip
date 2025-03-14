@@ -11,6 +11,8 @@ services:
         - PGID=${PGID}
     volumes:
       - ./../:/var/www/
+    networks:
+      - feip-network
 
   nginx:
     container_name: nginx
@@ -22,3 +24,31 @@ services:
       - ..:/var/www:rw
     depends_on:
       - php-fpm
+    networks:
+      - feip-network
+
+
+  postgres:
+    container_name: postgresFeip 
+    image: postgres:14.0-alpine
+    volumes:
+      - v-postgresFeip:/var/lib/postgresql/data/
+    ports:
+      - 5433:5432
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    networks:
+      - feip-network
+
+volumes:
+  v-postgresFeip:
+
+networks:
+  feip-network:
+    driver: bridge
