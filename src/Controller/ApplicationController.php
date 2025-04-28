@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Service\CsvManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,49 +12,39 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class ApplicationController extends AbstractController
 {
+    public function __construct(private readonly CsvManager $csvManager)
+    {
+    }
+
     #[Route('/api/application', name: 'application_list', methods: ['GET'])]
     public function applicationList(): JsonResponse
     {
-        $csvPath = $this->getParameter('kernel.project_dir') . '/var/data/bookings.csv';
-        $csvFile = file($csvPath);
+        $data = $this->csvManager->readAll('bookings.csv');
         $applications = [];
-        foreach ($csvFile as $line) {
-            $data = str_getcsv($line);
+        foreach ($data as $line) {
             $applications[] = [
-                'id' => (int)$data[0],
-                'phone_number' => $data[1],
-                'house_id' => (int)$data[2],
-                'comment' => $data[3],
+                'id' => (int)$line[0],
+                'phone_number' => $line[1],
+                'house_id' => (int)$line[2],
+                'comment' => $line[3],
             ];
         }
-        return $this->json($applications);
+        return new JsonResponse($applications);
     }
 
     #[Route('/api/application/{id}', name: 'application_detail', methods: ['GET'])]
     public function getApplication(int $id): JsonResponse
     {
-        $csvPath = $this->getParameter('kernel.project_dir') . '/var/data/bookings.csv';
-        $csvFile = file($csvPath);
-        $data = null;
-
-        foreach ($csvFile as $line) {
-            $lineData = str_getcsv($line);
-            if ((int)$lineData[0] === $id) {
-                $data = [
-                    'id' => (int)$lineData[0],
-                    'phone_number' => $lineData[1],
-                    'house_id' => (int)$lineData[2],
-                    'comment' => $lineData[3],
-                ];
-                break;
-            }
-        }
-
+        $data = $this->csvManager->readById('bookings.csv', $id);
         if ($data === null) {
             return new JsonResponse(['error' => 'Application not found'], 404);
         }
-
-        return $this->json($data);
+        return new JsonResponse([
+            'id' => (int)$data[0],
+            'phone_number' => $data[1],
+            'house_id' => (int)$data[2],
+            'comment' => $data[3],
+        ]);
     }
 
     #[Route('/api/application', name: 'application_create', methods: ['POST'])]
@@ -64,16 +55,12 @@ class ApplicationController extends AbstractController
             return new JsonResponse(['error' => 'Invalid JSON'], 400);
         }
 
-        $csvPath = $this->getParameter('kernel.project_dir') . '/var/data/bookings.csv';
-        $csvFile = fopen($csvPath, 'a');
-        fputcsv($csvFile, [
+        $this->csvManager->append('bookings.csv', [
             $data['id'],
             $data['phone_number'],
             $data['house_id'],
             $data['comment'],
         ]);
-        fclose($csvFile);
-
         return new JsonResponse(['message' => 'Application created'], 201);
     }
 
@@ -84,31 +71,12 @@ class ApplicationController extends AbstractController
         if (json_last_error() !== JSON_ERROR_NONE) {
             return new JsonResponse(['error' => 'Invalid JSON'], 400);
         }
-
-        $csvPath = $this->getParameter('kernel.project_dir') . '/var/data/bookings.csv';
-        $csvFile = file($csvPath);
-
-        if ($csvFile === false) {
-            return new JsonResponse(['error' => 'File not found'], 404);
-        }
-
-        $comment = $data['comment'] ?? null;
-
-        foreach ($csvFile as $index => $line) {
-            $lineData = str_getcsv($line);
-            if (count($lineData) < 4) {
-                continue;
-            }
-
-            if ((int)$lineData[0] === $id) {
-                $lineData[3] = $comment ?? '';
-                $csvFile[$index] = implode(',', $lineData) . "\n";
-                file_put_contents($csvPath, implode('', $csvFile));
-                break;
-            }
-        }
-
-
+        $this->csvManager->overwriteRow('bookings.csv', $id, [
+            $data['id'],
+            $data['phone_number'],
+            $data['house_id'],
+            $data['comment'],
+        ]);
         return new JsonResponse(['message' => 'Application updated'], 200);
     }
 }
