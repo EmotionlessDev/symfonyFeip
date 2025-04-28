@@ -12,8 +12,10 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class ApplicationController extends AbstractController
 {
-    public function __construct(private readonly CsvManager $csvManager)
+    private readonly CsvManager $csvManager;
+    public function __construct()
     {
+        $this->csvManager = new CsvManager(__DIR__ . '/../../var/data');
     }
 
     #[Route('/api/application', name: 'application_list', methods: ['GET'])]

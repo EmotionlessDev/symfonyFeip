@@ -15,10 +15,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 class HouseController extends AbstractController
 {
+    private readonly CsvManager $csvManager;
 
-    public function __construct(private readonly CsvManager $csvManager)
+    public function __construct()
     {
-
+        $this->csvManager = new CsvManager(__DIR__ . '/../../var/data');
     }
     #[Route('/api/house', name: 'house_list', methods: ['GET'])]
     public function houseList(): JsonResponse

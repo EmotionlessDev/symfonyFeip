@@ -3,6 +3,8 @@
 namespace App\Service;
 
 
+use RuntimeException;
+
 class CsvManager
 {
     private string $dataDir;
@@ -10,10 +12,14 @@ class CsvManager
     /**
      * CsvManager constructor.
      *
+     * @param string $dataDir Путь к директории с CSV файлами.
      */
-    public function __construct()
+    public function __construct(string $dataDir)
     {
-        $this->dataDir = __DIR__ . '/../../var/data';
+        $this->dataDir = $dataDir;
+        if (!is_dir($this->dataDir)) {
+            throw new RuntimeException("Directory `$this->dataDir` does not exist");
+        }
     }
 
     /**
@@ -37,13 +43,13 @@ class CsvManager
     {
         $path = $this->getPath($filename);
         if (!file_exists($path)) {
-            throw new \RuntimeException("File `$filename` not found");
+            throw new RuntimeException("File `$filename` not found");
         }
 
         $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         $rows = [];
         foreach ($lines as $line) {
-            $rows[] = str_getcsv($line);
+            $rows[] = str_getcsv($line, ',', '"', '\\');
         }
         return $rows;
     }
@@ -77,9 +83,12 @@ class CsvManager
         $path = $this->getPath($filename);
         $handle = fopen($path, 'a');
         if (false === $handle) {
-            throw new \RuntimeException("Could not open file `$filename` for writing");
+            throw new RuntimeException("Could not open file `$filename` for writing");
         }
-        fputcsv($handle, $row);
+        if (filesize($path) > 0) {
+            fwrite($handle, PHP_EOL);
+        }
+        fputcsv($handle, $row, ',', '"', '\\');
         fclose($handle);
     }
 
@@ -94,10 +103,10 @@ class CsvManager
         $path = $this->getPath($filename);
         $handle = fopen($path, 'w');
         if (false === $handle) {
-            throw new \RuntimeException("Could not open file `$filename` for writing");
+            throw new RuntimeException("Could not open file `$filename` for writing");
         }
         foreach ($rows as $row) {
-            fputcsv($handle, $row);
+            fputcsv($handle, $row, ',', '"', '\\');
         }
         fclose($handle);
     }
@@ -116,7 +125,7 @@ class CsvManager
             $rows[$rowIndex] = $newRow;
             $this->overwrite($filename, $rows);
         } else {
-            throw new \RuntimeException("Row index `$rowIndex` out of bounds");
+            throw new RuntimeException("Row index `$rowIndex` out of bounds");
         }
     }
 
