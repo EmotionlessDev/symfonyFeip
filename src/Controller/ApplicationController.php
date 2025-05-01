@@ -12,16 +12,17 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class ApplicationController extends AbstractController
 {
-    private readonly CsvManager $csvManager;
-    public function __construct()
-    {
-        $this->csvManager = new CsvManager(__DIR__ . '/../../var/data');
+    public function __construct(
+        private readonly CsvManager $csvManager,
+        private readonly string     $filename
+    ) {
+
     }
 
     #[Route('/api/application', name: 'application_list', methods: ['GET'])]
     public function applicationList(): JsonResponse
     {
-        $data = $this->csvManager->readAll('bookings.csv');
+        $data = $this->csvManager->readAll($this->filename);
         $applications = [];
         foreach ($data as $line) {
             $applications[] = [
@@ -37,7 +38,7 @@ class ApplicationController extends AbstractController
     #[Route('/api/application/{id}', name: 'application_detail', methods: ['GET'])]
     public function getApplication(int $id): JsonResponse
     {
-        $data = $this->csvManager->readById('bookings.csv', $id);
+        $data = $this->csvManager->readById($this->filename, $id);
         if ($data === null) {
             return new JsonResponse(['error' => 'Application not found'], 404);
         }
@@ -57,7 +58,7 @@ class ApplicationController extends AbstractController
             return new JsonResponse(['error' => 'Invalid JSON'], 400);
         }
 
-        $this->csvManager->append('bookings.csv', [
+        $this->csvManager->append($this->filename, [
             $data['id'],
             $data['phone_number'],
             $data['house_id'],
@@ -73,7 +74,7 @@ class ApplicationController extends AbstractController
         if (json_last_error() !== JSON_ERROR_NONE) {
             return new JsonResponse(['error' => 'Invalid JSON'], 400);
         }
-        $this->csvManager->overwriteRow('bookings.csv', $id, [
+        $this->csvManager->overwriteRow($this->filename, $id, [
             $data['id'],
             $data['phone_number'],
             $data['house_id'],

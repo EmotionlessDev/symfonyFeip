@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Service;
+namespace App\Tests\Unit;
 
 use App\Service\CsvManager;
 use PHPUnit\Framework\TestCase;

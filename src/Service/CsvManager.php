@@ -115,18 +115,27 @@ class CsvManager
      * перезаписывает строку в CSV файле по индексу.
      *
      * @param string $filename
-     * @param int $rowIndex
+     * @param int $id
      * @param array<string|int|float> $newRow
      */
-    public function overwriteRow(string $filename, int $rowIndex, array $newRow): void
+    public function overwriteRow(string $filename, int $id, array $newRow): void
     {
         $rows = $this->readAll($filename);
-        if (isset($rows[$rowIndex])) {
-            $rows[$rowIndex] = $newRow;
-            $this->overwrite($filename, $rows);
-        } else {
-            throw new RuntimeException("Row index `$rowIndex` out of bounds");
+
+        $found = false;
+        foreach ($rows as $index => $row) {
+            if ((int)$row[0] === $id) {
+                $rows[$index] = $newRow;
+                $found = true;
+                break;
+            }
         }
+
+        if (! $found) {
+            throw new RuntimeException("Row with ID `$id` not found in `$filename`");
+        }
+
+        $this->overwrite($filename, $rows);
     }
 
 
