@@ -18,7 +18,7 @@ class ApplicationControllerTest extends WebTestCase
             mkdir($this->dataDir, 0777, true);
         }
 
-        $filename = $kernel->getContainer()->getParameter('app.csv_filename');
+        $filename = $kernel->getContainer()->getParameter('app.csv_bookings_filename');
         $this->csvPath = $this->dataDir . '/' . $filename;
 
         $rows = [

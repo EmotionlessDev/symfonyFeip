@@ -15,16 +15,17 @@ use Symfony\Component\HttpFoundation\Request;
 
 class HouseController extends AbstractController
 {
-    private readonly CsvManager $csvManager;
 
-    public function __construct()
+    public function __construct(
+        private readonly CsvManager $csvManager,
+        private readonly string $filename,
+    )
     {
-        $this->csvManager = new CsvManager(__DIR__ . '/../../var/data');
     }
     #[Route('/api/house', name: 'house_list', methods: ['GET'])]
     public function houseList(): JsonResponse
     {
-        $data = $this->csvManager->readAll('houses.csv');
+        $data = $this->csvManager->readAll($this->filename);
         $houses = [];
         foreach ($data as $line) {
             $houses[] = [
@@ -42,7 +43,7 @@ class HouseController extends AbstractController
     #[Route('/api/house/{id}', name: 'house_detail', methods: ['GET'])]
     public function getHouse(int $id): JsonResponse
     {
-        $data = $this->csvManager->readAll('houses.csv');
+        $data = $this->csvManager->readAll($this->filename);
         $house = null;
         foreach ($data as $line) {
             if ((int)$line[0] === $id) {
@@ -71,7 +72,7 @@ class HouseController extends AbstractController
             return new JsonResponse(['error' => 'Invalid JSON'], HttpResponse::HTTP_BAD_REQUEST);
         }
 
-        $this->csvManager->append('houses.csv', [
+        $this->csvManager->append($this->filename, [
             $data['id'],
             $data['name'],
             $data['sleeping_capacity'],
@@ -90,7 +91,7 @@ class HouseController extends AbstractController
             return new JsonResponse(['error' => 'Invalid JSON'], HttpResponse::HTTP_BAD_REQUEST);
         }
 
-        $this->csvManager->overwriteRow('houses.csv', $id, [
+        $this->csvManager->overwriteRow($this->filename, $id, [
             $data['id'],
             $data['name'],
             $data['sleeping_capacity'],
