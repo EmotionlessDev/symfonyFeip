@@ -1,3 +1,3 @@
 parameters:
-    app.csv_houses_filename: 'houses.csv'
-    app.csv_bookings_filename: 'bookings.csv'
+    app.csv_houses_filename: 'housesTest.csv'
+    app.csv_bookings_filename: 'bookingsTest.csv'

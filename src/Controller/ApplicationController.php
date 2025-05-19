@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class ApplicationController extends AbstractController
 {
@@ -40,7 +41,7 @@ class ApplicationController extends AbstractController
     {
         $data = $this->csvManager->readById($this->filename, $id);
         if ($data === null) {
-            return new JsonResponse(['error' => 'Application not found'], 404);
+            return new JsonResponse(['error' => 'Application not found'],  HttpResponse::HTTP_NOT_FOUND);
         }
         return new JsonResponse([
             'id' => (int)$data[0],
@@ -55,7 +56,11 @@ class ApplicationController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+            return new JsonResponse(['error' => 'Invalid JSON'], HttpResponse::HTTP_BAD_REQUEST);
+        }
+
+        if (!isset($data['id'], $data['phone_number'], $data['house_id'], $data['comment'])) {
+            return new JsonResponse(['error' => 'Missing required fields'], HttpResponse::HTTP_BAD_REQUEST);
         }
 
         $this->csvManager->append($this->filename, [
@@ -64,7 +69,7 @@ class ApplicationController extends AbstractController
             $data['house_id'],
             $data['comment'],
         ]);
-        return new JsonResponse(['message' => 'Application created'], 201);
+        return new JsonResponse(['message' => 'Application created'], HttpResponse::HTTP_CREATED);
     }
 
     #[Route('/api/application/{id}', name: 'application_update', methods: ['PUT'])]
@@ -72,14 +77,19 @@ class ApplicationController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+            return new JsonResponse(['error' => 'Invalid JSON'], HttpResponse::HTTP_BAD_REQUEST);
         }
+
+        if (!isset($data['id'], $data['phone_number'], $data['house_id'], $data['comment'])) {
+            return new JsonResponse(['error' => 'Missing required fields'], HttpResponse::HTTP_BAD_REQUEST);
+        }
+
         $this->csvManager->overwriteRow($this->filename, $id, [
             $data['id'],
             $data['phone_number'],
             $data['house_id'],
             $data['comment'],
         ]);
-        return new JsonResponse(['message' => 'Application updated'], 200);
+        return new JsonResponse(['message' => 'Application updated'], HttpResponse::HTTP_OK);
     }
 }

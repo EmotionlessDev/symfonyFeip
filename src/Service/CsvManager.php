@@ -4,6 +4,8 @@ namespace App\Service;
 
 
 use RuntimeException;
+use Symfony\Component\Filesystem\Path;
+
 
 class CsvManager
 {
@@ -30,7 +32,7 @@ class CsvManager
      */
     private function getPath(string $filename): string
     {
-        return $this->dataDir . '/' . $filename;
+        return Path::join($this->dataDir, $filename);
     }
 
     /**
@@ -55,7 +57,7 @@ class CsvManager
     }
 
     /**
-     * Читает CSV файл и возвращает массив строк.
+     * Читает CSV файл и возвращает строку по ID.
      *
      * @param string $filename
      * @param int $id

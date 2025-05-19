@@ -72,6 +72,10 @@ class HouseController extends AbstractController
             return new JsonResponse(['error' => 'Invalid JSON'], HttpResponse::HTTP_BAD_REQUEST);
         }
 
+        if (!isset($data['id'], $data['name'], $data['sleeping_capacity'], $data['bathrooms'], $data['location'], $data['price'])) {
+            return new JsonResponse(['error' => 'Missing required fields'], HttpResponse::HTTP_BAD_REQUEST);
+        }
+
         $this->csvManager->append($this->filename, [
             $data['id'],
             $data['name'],
@@ -89,6 +93,10 @@ class HouseController extends AbstractController
         $data = json_decode($request->getContent(), true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             return new JsonResponse(['error' => 'Invalid JSON'], HttpResponse::HTTP_BAD_REQUEST);
+        }
+
+        if (!isset($data['id'], $data['name'], $data['sleeping_capacity'], $data['bathrooms'], $data['location'], $data['price'])) {
+            return new JsonResponse(['error' => 'Missing required fields'], HttpResponse::HTTP_BAD_REQUEST);
         }
 
         $this->csvManager->overwriteRow($this->filename, $id, [
