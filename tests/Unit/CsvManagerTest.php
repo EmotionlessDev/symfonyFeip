@@ -4,7 +4,7 @@ namespace App\Tests\Unit;
 
 use App\Service\CsvManager;
 use PHPUnit\Framework\TestCase;
-
+use Symfony\Component\Filesystem\Path;
 class CsvManagerTest extends TestCase
 {
     private CsvManager $csvManager;
@@ -12,15 +12,16 @@ class CsvManagerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->csvManager = new CsvManager(__DIR__ . '/../testData');
+        $this->csvManager = new CsvManager(Path::join(__DIR__, '..', 'testData'));
         $this->filename = 'test.csv';
-        file_put_contents(__DIR__ . "/../testData/$this->filename", "id,name,age\n1,John Doe,30\n2,Jane Smith,25");
+        file_put_contents(Path::join(__DIR__, '..', 'testData', $this->filename), "id,name,age\n1,John Doe,30\n2,Jane Smith,25");
     }
 
     protected function tearDown(): void
     {
-        if (file_exists(__DIR__ . "/../testData/$this->filename")) {
-            unlink(__DIR__ . "/../testData/$this->filename");
+        $path = Path::join(__DIR__, '..', 'testData', $this->filename);
+        if (file_exists($path)) {
+            unlink($path);
         }
     }
 

@@ -2,7 +2,7 @@
 
 namespace App\Tests\Integration;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-
+use Symfony\Component\Filesystem\Path;
 class HouseControllerTest extends WebTestCase
 {
 
@@ -11,13 +11,14 @@ class HouseControllerTest extends WebTestCase
         $this->client = static::createClient();
         $kernel = $this->client->getKernel();
 
-        $this->dataDir = $kernel->getProjectDir() . '/var/data';
+        $this->dataDir = Path::join($kernel->getProjectDir(), 'var', 'data');
         if (!is_dir($this->dataDir)) {
             mkdir($this->dataDir, 0777, true);
         }
 
         $filename = $kernel->getContainer()->getParameter('app.csv_houses_filename');
-        $this->csvPath = $this->dataDir . '/' . $filename;
+        $this->csvPath = Path::join($this->dataDir, $filename);
+
 
         $rows = [
             [1, 'House A', 4, 2, 'Location A', 100],
