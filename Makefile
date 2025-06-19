@@ -19,5 +19,10 @@ dc_logs:
 dc_down:
 	docker-compose --env-file ./.env.local -f .docker/docker-compose.yml down -v --rmi=all --remove-orphans
 
+dc_clear:
+	docker-compose --env-file ./.env.local -f .docker/docker-compose.yml down -v --remove-orphans
+	docker volume prune -f
+	docker network prune -f
+
 app_bash:
 	docker-compose --env-file ./.env.local -f .docker/docker-compose.yml exec -u www-data php-fpm bash
