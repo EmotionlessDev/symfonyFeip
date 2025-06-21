@@ -87,7 +87,14 @@ class HouseController extends AbstractController
         $this->entityManager->persist($house);
         $this->entityManager->flush();
 
-        return new JsonResponse(['message' => 'House created successfully'], HttpResponse::HTTP_CREATED);
+        return new JsonResponse([
+            'id' => $house->getId(),
+            'name' => $house->getName(),
+            'sleeping_capacity' => $house->getSleepingCapacity(),
+            'bathrooms' => $house->getBathrooms(),
+            'location' => $house->getLocation(),
+            'price' => $house->getPrice(),
+        ], HttpResponse::HTTP_CREATED);
     }
 
     #[Route('/api/house/{id}', name: 'house_update', methods: ['PUT'])]
@@ -113,6 +120,13 @@ class HouseController extends AbstractController
 
         $this->entityManager->flush();
 
-        return new JsonResponse(['message' => 'House updated successfully']);
+        return new JsonResponse([
+            'id' => $house->getId(),
+            'name' => $house->getName(),
+            'sleeping_capacity' => $house->getSleepingCapacity(),
+            'bathrooms' => $house->getBathrooms(),
+            'location' => $house->getLocation(),
+            'price' => $house->getPrice(),
+        ], HttpResponse::HTTP_OK);
     }
 }

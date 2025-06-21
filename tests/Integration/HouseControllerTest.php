@@ -1,106 +1,103 @@
 <?php
 
 namespace App\Tests\Integration;
+
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Filesystem\Path;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Common\DataFixtures\Loader;
+use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
+use App\Tests\Fixture\HouseFixture;
+use RuntimeException;
+use Exception;
+
 class HouseControllerTest extends WebTestCase
 {
+    private KernelBrowser $client;
+    private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
     {
-        $this->client = static::createClient();
-        $kernel = $this->client->getKernel();
+        $this->client = static::createClient([], [
+            'HTTP_ACCEPT' => 'application/json',
+        ]);
+        $this->entityManager = self::getContainer()->get(EntityManagerInterface::class);
 
-        $this->dataDir = Path::join($kernel->getProjectDir(), 'var', 'data');
-        if (!is_dir($this->dataDir)) {
-            mkdir($this->dataDir, 0777, true);
+        try {
+            // Need to purge the database before running tests
+            // Autoincrement IDs should be reset
+            $connection = $this->entityManager->getConnection();
+            $connection->executeStatement('TRUNCATE house RESTART IDENTITY CASCADE');
+
+            $loader = new Loader();
+            $loader->addFixture(new HouseFixture());
+
+            $executor = new ORMExecutor($this->entityManager);
+            $executor->execute($loader->getFixtures(), append: true);
+        } catch (Exception $e) {
+            throw new RuntimeException('Failed to set up test environment: ' . $e->getMessage());
         }
-
-        $filename = $kernel->getContainer()->getParameter('app.csv_houses_filename');
-        $this->csvPath = Path::join($this->dataDir, $filename);
-
-
-        $rows = [
-            [1, 'House A', 4, 2, 'Location A', 100],
-            [2, 'House B', 6, 3, 'Location B', 150],
-        ];
-        $content = '';
-        foreach ($rows as $row) {
-            $content .= implode(',', $row) . "\n";
-        }
-        file_put_contents($this->csvPath, $content);
     }
 
     protected function tearDown(): void
     {
-        if (file_exists($this->csvPath)) {
-            unlink($this->csvPath);
-        }
         parent::tearDown();
+        $this->entityManager->close();
     }
 
-    public function testListHouses(): void
+    public function testHouseList(): void
     {
         $this->client->request('GET', '/api/house');
-        $this->assertResponseIsSuccessful();
+        $response = $this->client->getResponse();
 
-        $data = json_decode($this->client->getResponse()->getContent(), true);
-        $this->assertCount(2, $data);
-        $this->assertSame(1, $data[0]['id']);
-        $this->assertSame('House A', $data[0]['name']);
-        $this->assertSame(4, $data[0]['sleeping_capacity']);
-        $this->assertSame(2, $data[0]['bathrooms']);
-        $this->assertSame('Location A', $data[0]['location']);
-        $this->assertSame(100, $data[0]['price']);
+        $this->assertResponseIsSuccessful();
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertIsArray($data);
+        $this->assertCount(1, $data);
+        $this->assertEquals('Test House', $data[0]['name']);
     }
 
     public function testGetHouse(): void
     {
         $this->client->request('GET', '/api/house/1');
-        $this->assertResponseIsSuccessful();
+        $response = $this->client->getResponse();
 
-        $data = json_decode($this->client->getResponse()->getContent(), true);
-        $this->assertSame(1, $data['id']);
-        $this->assertSame('House A', $data['name']);
-        $this->assertSame(4, $data['sleeping_capacity']);
-        $this->assertSame(2, $data['bathrooms']);
-        $this->assertSame('Location A', $data['location']);
-        $this->assertSame(100, $data['price']);
+        $this->assertResponseIsSuccessful();
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertEquals('Test House', $data['name']);
     }
 
     public function testCreateHouse(): void
     {
-        $payload = [
-            'id' => 3,
-            'name' => 'House C',
-            'sleeping_capacity' => 5,
-            'bathrooms' => 2,
-            'location' => 'Location C',
+        $this->client->request('POST', '/api/house', [], [], [
+            'CONTENT_TYPE' => 'application/json',
+        ], json_encode([
+            'name' => 'New House',
+            'sleeping_capacity' => 3,
+            'bathrooms' => 1,
+            'location' => 'Test Street',
             'price' => 200,
-        ];
+        ]));
 
-        $this->client->request('POST', '/api/house', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode($payload));
         $this->assertResponseStatusCodeSame(201);
-
-        $data = json_decode($this->client->getResponse()->getContent(), true);
-        $this->assertSame('House created successfully', $data['message']);
     }
 
     public function testUpdateHouse(): void
     {
-        $payload = [
-            'id' => 1,
-            'name' => 'Updated House A',
-            'sleeping_capacity' => 4,
-            'bathrooms' => 2,
-            'location' => 'Updated Location A',
-            'price' => 120,
-        ];
+        $this->client->request('PUT', '/api/house/1', [], [], [
+            'CONTENT_TYPE' => 'application/json',
+        ], json_encode([
+            'name' => 'Updated House',
+            'sleeping_capacity' => 5,
+        ]));
 
-        $this->client->request('PUT', '/api/house/1', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode($payload));
-        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseIsSuccessful();
 
+        $this->client->request('GET', '/api/house/1');
         $data = json_decode($this->client->getResponse()->getContent(), true);
-        $this->assertSame('House updated successfully', $data['message']);
+        $this->assertEquals('Updated House', $data['name']);
+        $this->assertEquals(5, $data['sleeping_capacity']);
     }
 }

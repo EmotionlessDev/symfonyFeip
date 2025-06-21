@@ -88,7 +88,12 @@ class BookingController extends AbstractController
         $this->entityManager->persist($booking);
         $this->entityManager->flush();
 
-        return new JsonResponse(['message' => 'Booking created', 'id' => $booking->getId()], HttpResponse::HTTP_CREATED);
+        return new JsonResponse([
+            'id' => $booking->getId(),
+            'phone_number' => $booking->getPhoneNumber(),
+            'house_id' => $booking->getHouse()->getId(),
+            'comment' => $booking->getComment(),
+        ], HttpResponse::HTTP_CREATED);
     }
 
     #[Route('/api/booking/{id}', name: 'booking_update', methods: ['PUT'])]
@@ -104,21 +109,31 @@ class BookingController extends AbstractController
             return new JsonResponse(['error' => 'Invalid JSON'], HttpResponse::HTTP_BAD_REQUEST);
         }
 
-        if (!isset($data['phone_number'], $data['house_id'], $data['comment'])) {
+        if (!isset($data['phone_number'], $data['comment'])) {
             return new JsonResponse(['error' => 'Missing required fields'], HttpResponse::HTTP_BAD_REQUEST);
         }
 
-        $house = $this->houseRepository->find($data['house_id']);
-        if (!$house) {
-            return new JsonResponse(['error' => 'House not found'], HttpResponse::HTTP_NOT_FOUND);
-        }
+
 
         $booking->setPhoneNumber($data['phone_number']);
         $booking->setComment($data['comment']);
-        $booking->setHouse($house);
+
+        if (isset($data['house_id'])) {
+            $house = $this->houseRepository->find($data['house_id']);
+            if (!$house) {
+                return new JsonResponse(['error' => 'House not found'], HttpResponse::HTTP_NOT_FOUND);
+            }
+        } else {
+            $house = $booking->getHouse();
+        }
 
         $this->entityManager->flush();
 
-        return new JsonResponse(['message' => 'Booking updated'], HttpResponse::HTTP_OK);
+        return new JsonResponse([
+            'id' => $booking->getId(),
+            'phone_number' => $booking->getPhoneNumber(),
+            'house_id' => $booking->getHouse()->getId(),
+            'comment' => $booking->getComment(),
+        ], HttpResponse::HTTP_OK);
     }
 }
