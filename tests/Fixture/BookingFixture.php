@@ -10,7 +10,6 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 class BookingFixture extends AbstractFixture implements DependentFixtureInterface
 {
-
     public function getDependencies(): array
     {
         return [

@@ -14,8 +14,6 @@ use App\Repository\BookingRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Booking;
 
-
-
 class BookingController extends AbstractController
 {
     public function __construct(

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Tests\Integration;
+
 use App\Tests\Fixture\BookingFixture;
 use App\Tests\Fixture\HouseFixture;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
@@ -10,7 +11,6 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use RuntimeException;
 use Exception;
-
 
 class BookingControllerTest extends WebTestCase
 {

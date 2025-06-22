@@ -12,16 +12,11 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Entity\House;
 use Doctrine\ORM\EntityManagerInterface;
 
-
-
-
 class HouseController extends AbstractController
 {
-
     public function __construct(
         private readonly EntityManagerInterface $entityManager
-    )
-    {
+    ) {
     }
     #[Route('/api/house', name: 'house_list', methods: ['GET'])]
     public function houseList(): JsonResponse
