@@ -1,3 +1,4 @@
+# Docker
 dc_build:
 	docker-compose --env-file ./.env.local -f .docker/docker-compose.yml build
 
@@ -26,3 +27,10 @@ dc_clear:
 
 app_bash:
 	docker-compose --env-file ./.env.local -f .docker/docker-compose.yml exec -u www-data php-fpm bash
+
+# PHPCodeSniffer
+phpcs:
+	./vendor/bin/phpcs
+
+phpcbf:
+	./vendor/bin/phpcbf
