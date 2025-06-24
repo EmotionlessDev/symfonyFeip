@@ -10,7 +10,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class BookingFixture extends AbstractFixture implements DependentFixtureInterface
+final class BookingFixture extends AbstractFixture implements DependentFixtureInterface
 {
     #[\Override]
     public function getDependencies(): array

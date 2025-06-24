@@ -8,7 +8,7 @@ use App\Repository\BookingRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: BookingRepository::class)]
-class Booking
+final class Booking
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

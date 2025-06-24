@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
-class BookingController extends AbstractController
+final class BookingController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,

@@ -11,7 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
 /**
  * @extends ServiceEntityRepository<House>
  */
-class HouseRepository extends ServiceEntityRepository
+final class HouseRepository extends ServiceEntityRepository
 {
 
 

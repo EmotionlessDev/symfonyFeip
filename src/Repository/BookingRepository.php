@@ -11,7 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
 /**
  * @extends ServiceEntityRepository<Booking>
  */
-class BookingRepository extends ServiceEntityRepository
+final class BookingRepository extends ServiceEntityRepository
 {
 
 

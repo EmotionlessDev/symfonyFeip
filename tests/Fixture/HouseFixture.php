@@ -8,7 +8,7 @@ use App\Entity\House;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
 
-class HouseFixture extends AbstractFixture
+final class HouseFixture extends AbstractFixture
 {
     #[\Override]
     public function load(ObjectManager $manager): void
