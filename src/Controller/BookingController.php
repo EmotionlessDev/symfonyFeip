@@ -119,7 +119,7 @@ class BookingController extends AbstractController
                 return new JsonResponse(['error' => 'House not found'], HttpResponse::HTTP_NOT_FOUND);
             }
         } else {
-            $house = $booking->getHouse();
+            $booking->getHouse();
         }
 
         $this->entityManager->flush();

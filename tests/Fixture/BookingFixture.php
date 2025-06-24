@@ -12,6 +12,7 @@ use Doctrine\Persistence\ObjectManager;
 
 class BookingFixture extends AbstractFixture implements DependentFixtureInterface
 {
+    #[\Override]
     public function getDependencies(): array
     {
         return [
@@ -19,6 +20,7 @@ class BookingFixture extends AbstractFixture implements DependentFixtureInterfac
         ];
     }
 
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $booking = new Booking();

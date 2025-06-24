@@ -13,10 +13,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class HouseRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, House::class);
-    }
+
 
     //    /**
     //     * @return House[] Returns an array of House objects

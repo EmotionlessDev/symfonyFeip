@@ -23,6 +23,7 @@ class HouseControllerTest extends WebTestCase
     private KernelBrowser $client;
     private EntityManagerInterface $entityManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->client = static::createClient([], [
@@ -46,6 +47,7 @@ class HouseControllerTest extends WebTestCase
         }
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         parent::tearDown();

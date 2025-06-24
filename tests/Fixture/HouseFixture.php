@@ -10,6 +10,7 @@ use Doctrine\Persistence\ObjectManager;
 
 class HouseFixture extends AbstractFixture
 {
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $house = new House();
