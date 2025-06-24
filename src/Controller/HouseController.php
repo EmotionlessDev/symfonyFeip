@@ -107,11 +107,21 @@ final class HouseController extends AbstractController
             return new JsonResponse(['error' => 'House not found'], HttpResponse::HTTP_NOT_FOUND);
         }
 
-        $house->setName($data['name'] ?? $house->getName());
-        $house->setSleepingCapacity((int) ($data['sleeping_capacity'] ?? $house->getSleepingCapacity()));
-        $house->setBathrooms((int) ($data['bathrooms'] ?? $house->getBathrooms()));
-        $house->setLocation($data['location'] ?? $house->getLocation());
-        $house->setPrice((int) ($data['price'] ?? $house->getPrice()));
+        if (isset($data['name'])) {
+            $house->setName($data['name']);
+        }
+        if (isset($data['sleeping_capacity'])) {
+            $house->setSleepingCapacity((int) $data['sleeping_capacity']);
+        }
+        if (isset($data['bathrooms'])) {
+            $house->setBathrooms((int) $data['bathrooms']);
+        }
+        if (isset($data['location'])) {
+            $house->setLocation($data['location']);
+        }
+        if (isset($data['price'])) {
+            $house->setPrice((int) $data['price']);
+        }
 
         $this->entityManager->flush();
 

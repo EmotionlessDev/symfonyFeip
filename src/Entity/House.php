@@ -107,4 +107,19 @@ final class House
 
         return $this;
     }
+
+    public function getBookings(): Collection
+    {
+        return $this->bookings;
+    }
+
+    public function addBooking(Booking $booking): static
+    {
+        if (!$this->bookings->contains($booking)) {
+            $this->bookings[] = $booking;
+            $booking->setHouse($this);
+        }
+
+        return $this;
+    }
 }

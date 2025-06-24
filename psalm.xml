@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <psalm
-        errorLevel="3"
+        errorLevel="4"
         cacheDirectory="var/cache/.psalm-cache"
         ignoreInternalFunctionFalseReturn="false"
         ignoreInternalFunctionNullReturn="false"
@@ -22,9 +22,20 @@
         </ignoreFiles>
     </projectFiles>
 
+    <plugins>
+        <pluginClass class="Psalm\SymfonyPsalmPlugin\Plugin" />
+    </plugins>
+
     <issueHandlers>
-        <MissingReturnType errorLevel="info" />
-        <PossiblyUnusedMethod errorLevel="info" />
-        <UnusedVariable errorLevel="info" />
+        <MissingReturnType errorLevel="suppress" />
+        <PossiblyUnusedMethod errorLevel="suppress" />
+        <UnusedVariable errorLevel="suppress" />
+        <UnusedClass>
+            <errorLevel type="suppress">
+                <directory name="src/Controller" />
+                <directory name="src/Entity" />
+                <directory name="tests" />
+            </errorLevel>
+        </UnusedClass>
     </issueHandlers>
 </psalm>

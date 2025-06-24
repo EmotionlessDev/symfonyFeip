@@ -32,13 +32,14 @@ final class BookingController extends AbstractController
             $data[] = [
                 'id' => $booking->getId(),
                 'phone_number' => $booking->getPhoneNumber(),
-                'house_id' => $booking->getHouse()->getId(),
+                'house_id' => $booking->getHouse()?->getId(),
                 'comment' => $booking->getComment(),
             ];
         }
 
         return new JsonResponse($data);
     }
+
 
     #[Route('/api/booking/{id}', name: 'booking_detail', methods: ['GET'])]
     public function getBooking(int $id): JsonResponse
@@ -52,7 +53,7 @@ final class BookingController extends AbstractController
         $data = [
             'id' => $booking->getId(),
             'phone_number' => $booking->getPhoneNumber(),
-            'house_id' => $booking->getHouse()->getId(),
+            'house_id' => $booking->getHouse()?->getId(),
             'comment' => $booking->getComment(),
         ];
 
@@ -88,7 +89,7 @@ final class BookingController extends AbstractController
         return new JsonResponse([
             'id' => $booking->getId(),
             'phone_number' => $booking->getPhoneNumber(),
-            'house_id' => $booking->getHouse()->getId(),
+            'house_id' => $booking->getHouse()?->getId(),
             'comment' => $booking->getComment(),
         ], HttpResponse::HTTP_CREATED);
     }
@@ -118,8 +119,6 @@ final class BookingController extends AbstractController
             if (!$house) {
                 return new JsonResponse(['error' => 'House not found'], HttpResponse::HTTP_NOT_FOUND);
             }
-        } else {
-            $booking->getHouse();
         }
 
         $this->entityManager->flush();
@@ -127,7 +126,7 @@ final class BookingController extends AbstractController
         return new JsonResponse([
             'id' => $booking->getId(),
             'phone_number' => $booking->getPhoneNumber(),
-            'house_id' => $booking->getHouse()->getId(),
+            'house_id' => $booking->getHouse()?->getId(),
             'comment' => $booking->getComment(),
         ], HttpResponse::HTTP_OK);
     }
