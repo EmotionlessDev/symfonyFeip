@@ -36,6 +36,9 @@ phpcbf:
 	./vendor/bin/phpcbf
 
 # PHPcodeFixer
-
 cs-fix:
 	./vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --verbose
+
+# Psalm
+psalm:
+	./vendor/bin/psalm --output-format=console
