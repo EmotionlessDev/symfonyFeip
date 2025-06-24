@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Fixture;
 
+use App\Entity\House;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
-use App\Entity\House;
 
 class HouseFixture extends AbstractFixture
 {

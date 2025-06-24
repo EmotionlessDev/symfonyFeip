@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Integration;
 
 use App\Tests\Fixture\BookingFixture;
@@ -7,11 +9,16 @@ use App\Tests\Fixture\HouseFixture;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Loader;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
+use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use RuntimeException;
-use Exception;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 class BookingControllerTest extends WebTestCase
 {
     private KernelBrowser $client;
@@ -36,7 +43,7 @@ class BookingControllerTest extends WebTestCase
             $executor = new ORMExecutor($this->entityManager);
             $executor->execute($loader->getFixtures(), append: true);
         } catch (Exception $e) {
-            throw new RuntimeException('Failed to set up test environment: ' . $e->getMessage());
+            throw new RuntimeException('Failed to set up test environment: '.$e->getMessage());
         }
     }
 
@@ -114,7 +121,6 @@ class BookingControllerTest extends WebTestCase
         $this->assertEquals('House not found', $data['error']);
     }
 
-
     public function testCreateBookingWithMissingFields(): void
     {
         $this->client->request('POST', '/api/booking', [], [], [
@@ -131,6 +137,7 @@ class BookingControllerTest extends WebTestCase
         $this->assertIsArray($data);
         $this->assertEquals('Missing required fields', $data['error']);
     }
+
     public function testUpdateBooking(): void
     {
         $this->client->request('PUT', '/api/booking/1', [], [], [
