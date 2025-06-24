@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <psalm
-        errorLevel="2"
+        errorLevel="3"
         cacheDirectory="var/cache/.psalm-cache"
         ignoreInternalFunctionFalseReturn="false"
         ignoreInternalFunctionNullReturn="false"
@@ -21,4 +21,10 @@
             <file name="public/index.php" />
         </ignoreFiles>
     </projectFiles>
+
+    <issueHandlers>
+        <MissingReturnType errorLevel="info" />
+        <PossiblyUnusedMethod errorLevel="info" />
+        <UnusedVariable errorLevel="info" />
+    </issueHandlers>
 </psalm>

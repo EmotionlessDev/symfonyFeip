@@ -41,4 +41,7 @@ cs-fix:
 
 # Psalm
 psalm:
-	./vendor/bin/psalm --output-format=console
+	docker run --rm -v $(PWD):/app -w /app php:8.3-cli vendor/bin/psalm --output-format=console
+
+psalm-fix:
+	docker run --rm -v $(PWD):/app -w /app php:8.3-cli vendor/bin/psalm --alter --issues=all --dry-run
