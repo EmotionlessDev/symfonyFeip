@@ -4,25 +4,20 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response as HttpResponse;
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use App\Entity\House;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
+use Symfony\Component\Routing\Attribute\Route;
 
-
-
-
-class HouseController extends AbstractController
+final class HouseController extends AbstractController
 {
-
     public function __construct(
         private readonly EntityManagerInterface $entityManager
-    )
-    {
-    }
+    ) {}
+
     #[Route('/api/house', name: 'house_list', methods: ['GET'])]
     public function houseList(): JsonResponse
     {
@@ -67,22 +62,22 @@ class HouseController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        if (JSON_ERROR_NONE !== json_last_error()) {
             return new JsonResponse(['error' => 'Invalid JSON'], HttpResponse::HTTP_BAD_REQUEST);
         }
 
         foreach (['name', 'sleeping_capacity', 'bathrooms', 'location', 'price'] as $field) {
             if (!isset($data[$field])) {
-                return new JsonResponse(['error' => "Missing field: $field"], HttpResponse::HTTP_BAD_REQUEST);
+                return new JsonResponse(['error' => "Missing field: {$field}"], HttpResponse::HTTP_BAD_REQUEST);
             }
         }
 
         $house = new House();
         $house->setName($data['name']);
-        $house->setSleepingCapacity((int)$data['sleeping_capacity']);
-        $house->setBathrooms((int)$data['bathrooms']);
+        $house->setSleepingCapacity((int) $data['sleeping_capacity']);
+        $house->setBathrooms((int) $data['bathrooms']);
         $house->setLocation($data['location']);
-        $house->setPrice((int)$data['price']);
+        $house->setPrice((int) $data['price']);
 
         $this->entityManager->persist($house);
         $this->entityManager->flush();
@@ -102,7 +97,7 @@ class HouseController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        if (JSON_ERROR_NONE !== json_last_error()) {
             return new JsonResponse(['error' => 'Invalid JSON'], HttpResponse::HTTP_BAD_REQUEST);
         }
 
@@ -112,11 +107,21 @@ class HouseController extends AbstractController
             return new JsonResponse(['error' => 'House not found'], HttpResponse::HTTP_NOT_FOUND);
         }
 
-        $house->setName($data['name'] ?? $house->getName());
-        $house->setSleepingCapacity((int)($data['sleeping_capacity'] ?? $house->getSleepingCapacity()));
-        $house->setBathrooms((int)($data['bathrooms'] ?? $house->getBathrooms()));
-        $house->setLocation($data['location'] ?? $house->getLocation());
-        $house->setPrice((int)($data['price'] ?? $house->getPrice()));
+        if (isset($data['name'])) {
+            $house->setName($data['name']);
+        }
+        if (isset($data['sleeping_capacity'])) {
+            $house->setSleepingCapacity((int) $data['sleeping_capacity']);
+        }
+        if (isset($data['bathrooms'])) {
+            $house->setBathrooms((int) $data['bathrooms']);
+        }
+        if (isset($data['location'])) {
+            $house->setLocation($data['location']);
+        }
+        if (isset($data['price'])) {
+            $house->setPrice((int) $data['price']);
+        }
 
         $this->entityManager->flush();
 

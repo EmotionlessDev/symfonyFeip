@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\BookingRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: BookingRepository::class)]
-class Booking
+final class Booking
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

@@ -1,22 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Fixture;
 
+use App\Entity\Booking;
 use App\Entity\House;
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Persistence\ObjectManager;
-use App\Entity\Booking;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+use Doctrine\Persistence\ObjectManager;
 
-class BookingFixture extends AbstractFixture implements DependentFixtureInterface
+final class BookingFixture extends AbstractFixture implements DependentFixtureInterface
 {
-
+    #[\Override]
     public function getDependencies(): array
     {
         return [
             HouseFixture::class,
         ];
     }
+
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $booking = new Booking();

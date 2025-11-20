@@ -4,26 +4,23 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\Booking;
+use App\Repository\BookingRepository;
+use App\Repository\HouseRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
-use App\Repository\HouseRepository;
-use App\Repository\BookingRepository;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\Booking;
+use Symfony\Component\Routing\Attribute\Route;
 
-
-
-class BookingController extends AbstractController
+final class BookingController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly BookingRepository $bookingRepository,
         private readonly HouseRepository $houseRepository,
-    ) {
-    }
+    ) {}
 
     #[Route('/api/booking', name: 'booking_list', methods: ['GET'])]
     public function bookingList(): JsonResponse
@@ -35,13 +32,14 @@ class BookingController extends AbstractController
             $data[] = [
                 'id' => $booking->getId(),
                 'phone_number' => $booking->getPhoneNumber(),
-                'house_id' => $booking->getHouse()->getId(),
+                'house_id' => $booking->getHouse()?->getId(),
                 'comment' => $booking->getComment(),
             ];
         }
 
         return new JsonResponse($data);
     }
+
 
     #[Route('/api/booking/{id}', name: 'booking_detail', methods: ['GET'])]
     public function getBooking(int $id): JsonResponse
@@ -55,7 +53,7 @@ class BookingController extends AbstractController
         $data = [
             'id' => $booking->getId(),
             'phone_number' => $booking->getPhoneNumber(),
-            'house_id' => $booking->getHouse()->getId(),
+            'house_id' => $booking->getHouse()?->getId(),
             'comment' => $booking->getComment(),
         ];
 
@@ -67,7 +65,7 @@ class BookingController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        if (JSON_ERROR_NONE !== json_last_error()) {
             return new JsonResponse(['error' => 'Invalid JSON'], HttpResponse::HTTP_BAD_REQUEST);
         }
 
@@ -91,7 +89,7 @@ class BookingController extends AbstractController
         return new JsonResponse([
             'id' => $booking->getId(),
             'phone_number' => $booking->getPhoneNumber(),
-            'house_id' => $booking->getHouse()->getId(),
+            'house_id' => $booking->getHouse()?->getId(),
             'comment' => $booking->getComment(),
         ], HttpResponse::HTTP_CREATED);
     }
@@ -105,15 +103,13 @@ class BookingController extends AbstractController
         }
 
         $data = json_decode($request->getContent(), true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        if (JSON_ERROR_NONE !== json_last_error()) {
             return new JsonResponse(['error' => 'Invalid JSON'], HttpResponse::HTTP_BAD_REQUEST);
         }
 
         if (!isset($data['phone_number'], $data['comment'])) {
             return new JsonResponse(['error' => 'Missing required fields'], HttpResponse::HTTP_BAD_REQUEST);
         }
-
-
 
         $booking->setPhoneNumber($data['phone_number']);
         $booking->setComment($data['comment']);
@@ -123,8 +119,6 @@ class BookingController extends AbstractController
             if (!$house) {
                 return new JsonResponse(['error' => 'House not found'], HttpResponse::HTTP_NOT_FOUND);
             }
-        } else {
-            $house = $booking->getHouse();
         }
 
         $this->entityManager->flush();
@@ -132,7 +126,7 @@ class BookingController extends AbstractController
         return new JsonResponse([
             'id' => $booking->getId(),
             'phone_number' => $booking->getPhoneNumber(),
-            'house_id' => $booking->getHouse()->getId(),
+            'house_id' => $booking->getHouse()?->getId(),
             'comment' => $booking->getComment(),
         ], HttpResponse::HTTP_OK);
     }

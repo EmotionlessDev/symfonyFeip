@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\HouseRepository;
@@ -8,7 +10,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: HouseRepository::class)]
-class House
+final class House
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -106,9 +108,6 @@ class House
         return $this;
     }
 
-    /**
-     * @return Collection<int, Booking>
-     */
     public function getBookings(): Collection
     {
         return $this->bookings;
@@ -117,20 +116,8 @@ class House
     public function addBooking(Booking $booking): static
     {
         if (!$this->bookings->contains($booking)) {
-            $this->bookings->add($booking);
+            $this->bookings[] = $booking;
             $booking->setHouse($this);
-        }
-
-        return $this;
-    }
-
-    public function removeBooking(Booking $booking): static
-    {
-        if ($this->bookings->removeElement($booking)) {
-            // set the owning side to null (unless already changed)
-            if ($booking->getHouse() === $this) {
-                $booking->setHouse(null);
-            }
         }
 
         return $this;
