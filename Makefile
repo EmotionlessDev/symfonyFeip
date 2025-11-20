@@ -1,3 +1,4 @@
+# Docker
 dc_build:
 	docker-compose --env-file ./.env.local -f .docker/docker-compose.yml build
 
@@ -19,5 +20,28 @@ dc_logs:
 dc_down:
 	docker-compose --env-file ./.env.local -f .docker/docker-compose.yml down -v --rmi=all --remove-orphans
 
+dc_clear:
+	docker-compose --env-file ./.env.local -f .docker/docker-compose.yml down -v --remove-orphans
+	docker volume prune -f
+	docker network prune -f
+
 app_bash:
 	docker-compose --env-file ./.env.local -f .docker/docker-compose.yml exec -u www-data php-fpm bash
+
+# PHPCodeSniffer
+phpcs:
+	./vendor/bin/phpcs
+
+phpcbf:
+	./vendor/bin/phpcbf
+
+# PHPcodeFixer
+cs-fix:
+	./vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --verbose
+
+# Psalm
+psalm:
+	docker run --rm -v $(PWD):/app -w /app php:8.3-cli vendor/bin/psalm --output-format=console
+
+psalm-fix:
+	docker run --rm -v $(PWD):/app -w /app php:8.3-cli vendor/bin/psalm --alter --issues=all --dry-run

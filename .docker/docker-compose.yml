@@ -9,6 +9,8 @@ services:
       args:
         - PUID=${PUID}
         - PGID=${PGID}
+    extra_hosts:
+        - "host.docker.internal:host-gateway"
     volumes:
       - ./../:/var/www/
     networks:

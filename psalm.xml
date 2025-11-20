@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<psalm
+        errorLevel="4"
+        cacheDirectory="var/cache/.psalm-cache"
+        ignoreInternalFunctionFalseReturn="false"
+        ignoreInternalFunctionNullReturn="false"
+        ensureArrayIntOffsetsExist="true"
+        ensureArrayStringOffsetsExist="true"
+        strictBinaryOperands="true"
+        findUnusedCode="true"
+        findUnusedVariablesAndParams="true"
+>
+    <projectFiles>
+        <directory name="src" />
+        <directory name="tests" />
+        <ignoreFiles>
+            <directory name="vendor" />
+            <directory name="var" />
+            <directory name="bin" />
+            <file name="config/preload.php" />
+            <file name="public/index.php" />
+        </ignoreFiles>
+    </projectFiles>
+
+    <plugins>
+        <pluginClass class="Psalm\SymfonyPsalmPlugin\Plugin" />
+    </plugins>
+
+    <issueHandlers>
+        <MissingReturnType errorLevel="suppress" />
+        <PossiblyUnusedMethod errorLevel="suppress" />
+        <UnusedVariable errorLevel="suppress" />
+        <UnusedClass>
+            <errorLevel type="suppress">
+                <directory name="src/Controller" />
+                <directory name="src/Entity" />
+                <directory name="tests" />
+            </errorLevel>
+        </UnusedClass>
+    </issueHandlers>
+</psalm>
